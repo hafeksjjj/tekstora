@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#171426">
+<meta name="description" content="Tekstora — удобный редактор документов">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icons/icon-192.png">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tekstora">
+<title>Tekstora — приложение для документов</title>
+<style>
+:root{--purple:#8055f7;--deep:#171426;--line:#e8e2f5;--ink:#252039;--muted:#88819b;--paper:#fff}
+*{box-sizing:border-box}body{margin:0;background:#f3f0fa;color:var(--ink);font:15px Inter,"Segoe UI",Arial,sans-serif}
+button,input,select{font:inherit}button{cursor:pointer}
+.app{min-height:100vh;display:grid;grid-template-columns:245px minmax(0,1fr);grid-template-rows:72px 1fr}
+header{grid-column:1/3;background:linear-gradient(110deg,#171426,#28203e);color:#fff;display:flex;align-items:center;padding:0 24px;gap:18px;position:sticky;top:0;z-index:5}
+.brand{font-size:22px;font-weight:800;letter-spacing:-.5px;white-space:nowrap}.spark{color:#b99cff;font-size:27px;margin-right:8px}.topname{margin-left:24px;display:flex;align-items:center;gap:8px;color:#e5defa;min-width:0}.title-button{border:0;background:transparent;color:inherit;padding:6px 8px;border-radius:8px;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.title-button:hover{background:#ffffff16}.favorite-button{border:1px solid #594d75;background:#342b4b;color:#f4d778;border-radius:9px;padding:7px 10px}.favorite-button:hover{background:#46385f}.saved{color:#b9f2d4;font-size:13px;margin-left:auto;white-space:nowrap}header .download{background:var(--purple);color:#fff;border:0;border-radius:12px;padding:11px 16px;font-weight:700;white-space:nowrap}
+.sidebar{background:#1b172b;color:#c9c1dc;padding:22px 14px;display:flex;flex-direction:column;gap:8px;min-height:calc(100vh - 72px)}
+.new{padding:14px;background:var(--purple);color:#fff;border:0;border-radius:12px;font-weight:700;margin-bottom:12px}.nav{padding:13px 14px;border-radius:11px;cursor:pointer;user-select:none}.nav.active,.nav:hover{background:#393052;color:white}.asidebottom{margin-top:auto;border:1px solid #49405e;border-radius:14px;padding:15px;text-align:center;color:#b6a9d9;font-size:13px}
+main{min-width:0;overflow:auto;padding:18px 24px 58px}.toolbar{background:white;border:1px solid var(--line);border-radius:14px;padding:10px;display:flex;gap:7px;flex-wrap:wrap;align-items:center;box-shadow:0 5px 20px #34205a0a;position:sticky;top:72px;z-index:4}.toolbar button,.toolbar select,.size-wrap{background:#faf9fd;border:1px solid #e9e4f2;border-radius:8px;padding:9px 10px;color:#302846}.toolbar button:hover,.toolbar select:hover{background:#eee7ff}.toolbar button.is-active{background:#e9ddff;border-color:#a98bff;color:#5a34bc;box-shadow:inset 0 0 0 1px #a98bff}.toolbar button:focus-visible,.toolbar select:focus-visible,input:focus-visible{outline:2px solid #a98bff;outline-offset:1px}.toolbar select{max-width:190px}.font-select{width:170px}.style-select{width:145px}.size-wrap{display:flex;align-items:center;gap:5px;padding:3px 7px}.size-wrap span{font-size:12px;color:#766d88}.sizebox{width:58px;border:0;background:transparent;padding:6px 2px;text-align:center;font-weight:600}.divider{height:27px;width:1px;background:#e9e4f2;margin:0 2px}.color-wrap{display:flex;align-items:center;gap:4px;border:1px solid #e9e4f2;border-radius:8px;padding:4px 7px;background:#faf9fd;font-size:13px}.color-wrap input{width:25px;height:24px;padding:0;border:0;background:transparent}
+.workspace{display:grid;grid-template-columns:minmax(420px,1fr) 250px;gap:18px;margin-top:16px;align-items:start}.paper{background:var(--paper);min-height:calc(100vh - 205px);border:1px solid #e8e0f5;border-radius:16px;padding:58px clamp(28px,6vw,85px);box-shadow:0 10px 30px #30204a0b}#editor{outline:none;min-height:650px;line-height:1.65;font-size:12pt;font-family:Arial,sans-serif;overflow-wrap:anywhere}#editor:empty:before{content:attr(data-placeholder);color:#aaa3b8;pointer-events:none}#editor:focus:empty:before{opacity:0}#editor:focus{outline:none}
+#editor[data-whole-bold="true"],#editor[data-whole-bold="true"] *{font-weight:700!important}
+#editor[data-whole-italic="true"],#editor[data-whole-italic="true"] *{font-style:italic!important}
+#editor[data-whole-decoration="true"],#editor[data-whole-decoration="true"] *{text-decoration-line:var(--lw-whole-decoration)!important}
+#editor[data-whole-font-active="true"] *{font-family:var(--lw-whole-font)!important}
+#editor[data-whole-size-active="true"],#editor[data-whole-size-active="true"] *{font-size:var(--lw-whole-size)!important}
+#editor[data-whole-color-active="true"],#editor[data-whole-color-active="true"] *{color:var(--lw-whole-color)!important}#editor h1{font-size:30pt;line-height:1.2;color:#201936;margin:0 0 20px}#editor h2{color:#5d3bc4}#editor p{margin:12px 0}#editor table{border-collapse:collapse;width:100%;margin:20px 0}#editor td,#editor th{border:1px solid #d9cfee;padding:9px}#editor th{background:#f0eaff}#editor img{max-width:100%;height:auto;border-radius:8px}#editor a{color:#6740d5;text-decoration:underline}
+.panel{background:white;border:1px solid var(--line);border-radius:15px;padding:18px}.panel h3{margin:0 0 12px;font-size:16px}.tip{background:#f0eaff;border-radius:12px;padding:14px;font-size:13px;line-height:1.5}.quick{display:flex;flex-direction:column;gap:8px;margin-top:18px}.quick button{padding:10px;border:1px solid var(--line);background:#fff;border-radius:9px;text-align:left}.quick button:hover{background:#f6f1ff}
+#recentView{display:none;margin-top:18px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px;min-height:55vh}#recentView h2{margin:0 0 8px}.recent-sub{color:var(--muted);font-size:13px;margin-bottom:18px}.recent-tools{display:flex;gap:10px;margin-bottom:16px}.recent-tools input{border:1px solid var(--line);border-radius:9px;padding:10px 12px;min-width:0;flex:1}.recent-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}.recent-card{border:1px solid var(--line);border-radius:13px;padding:15px;text-align:left;background:#fff;color:var(--ink);min-height:128px;display:flex;flex-direction:column;gap:8px}.recent-card:hover{border-color:#bca8f7;background:#fcfaff}.recent-card strong{font-size:15px}.recent-card small{color:var(--muted);font-size:12px}.recent-preview{font-size:13px;color:#675f76;line-height:1.4;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}.empty-recent{padding:35px 12px;text-align:center;color:var(--muted);grid-column:1/-1;border:1px dashed var(--line);border-radius:12px}
+footer{position:fixed;bottom:0;left:245px;right:0;background:#fffdfd;border-top:1px solid var(--line);padding:9px 20px;color:var(--muted);font-size:12px;display:flex;justify-content:space-between;z-index:6}
+@media(max-width:1100px){.workspace{grid-template-columns:1fr}.panel{display:none}}@media(max-width:950px){.app{grid-template-columns:190px minmax(0,1fr)}footer{left:190px}.paper{padding:35px 28px}.topname{margin-left:4px}}@media(max-width:650px){.app{display:block}header{height:65px;padding:0 12px;gap:8px}.brand{font-size:18px}.topname{display:none}.sidebar{display:none}main{padding:10px 10px 25px}.paper{min-height:75vh;padding:25px 18px}.workspace{display:block}.toolbar{position:relative;top:auto}footer{position:static;gap:8px;flex-wrap:wrap}#recentView{padding:15px}}
+
+/* PWA install and phone layout */
+.install-app{background:#40345d;color:#fff;border:1px solid #68558f;border-radius:12px;padding:10px 14px;font-weight:700;white-space:nowrap}
+.install-app:hover{background:#584477}
+.mobile-nav{display:none}
+@media(max-width:650px){
+  header{position:sticky;top:0}
+  header .saved{display:none}
+  header .download{display:none}
+  .install-app{margin-left:auto;padding:9px 11px;font-size:13px}
+  main{padding-bottom:88px}
+  .toolbar{gap:6px;padding:8px}
+  .toolbar select{max-width:145px}
+  .font-select{width:135px}
+  .style-select{width:125px}
+  .toolbar button{padding:8px 9px}
+  .recent-list{grid-template-columns:1fr}
+  footer{display:none}
+  .mobile-nav{display:flex;position:fixed;z-index:20;left:0;right:0;bottom:0;padding:8px max(10px,env(safe-area-inset-left)) calc(8px + env(safe-area-inset-bottom));background:#1b172b;border-top:1px solid #493d62;justify-content:space-around;gap:4px}
+  .mobile-tab{flex:1;min-width:0;border:0;border-radius:10px;background:transparent;color:#c9c1dc;padding:7px 3px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:18px}
+  .mobile-tab span{font-size:10px}
+  .mobile-tab.active{background:#393052;color:#fff}
+  .paper{border-radius:12px}
+  #editor{min-height:58vh}
+}
+
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="brand"><span class="spark">✦</span>Tekstora</div>
+  <div class="topname">📄 <button class="title-button" id="titleButton" type="button" title="Нажми, чтобы переименовать документ">Новый документ　⌄</button><button class="favorite-button" id="favBtn" type="button" title="Добавить в избранное">☆</button></div>
+  <span class="saved" id="saveState" aria-live="polite">● Сохранено</span>
+  <button class="install-app" type="button" id="installBtn">Установить</button><button class="download" type="button" id="downloadBtn">Скачать DOC</button>
+</header>
+<aside class="sidebar">
+  <button type="button" class="new" id="newBtn">＋ Новый документ</button>
+  <div class="nav active" data-view="editor">▤　Документы</div>
+  <div class="nav" data-view="recent">◷　Недавние</div>
+  <div class="nav" data-view="favorites">☆　Избранное</div>
+  <div class="nav" id="templatesNav">▦　Шаблоны</div>
+  <div class="asidebottom">✦<br><b>Tekstora</b><p>Твои идеи — красиво оформлены.</p></div>
+</aside>
+<main>
+  <div class="toolbar" id="toolbar" aria-label="Панель форматирования">
+    <select class="style-select" id="blockStyle" aria-label="Стиль абзаца"><option value="">Стиль текста</option><option value="p">Обычный текст</option><option value="h1">Заголовок 1</option><option value="h2">Заголовок 2</option><option value="h3">Заголовок 3</option><option value="blockquote">Цитата</option></select>
+    <select class="font-select" id="fontSelect" aria-label="Шрифт всего документа">
+      <option value="Arial">Arial</option><option value="Calibri">Calibri</option><option value="Inter">Inter</option><option value="Georgia">Georgia</option><option value="'Times New Roman'">Times New Roman</option><option value="Verdana">Verdana</option><option value="Tahoma">Tahoma</option><option value="'Trebuchet MS'">Trebuchet MS</option><option value="'Courier New'">Courier New</option>
+    </select>
+    <label class="size-wrap" title="Размер всего документа в пунктах"><input id="fontSize" class="sizebox" type="number" min="6" max="96" step="1" value="12" aria-label="Размер шрифта всего документа"><span>пт</span></label>
+    <span class="divider"></span>
+    <button type="button" data-whole-format="bold" title="Жирный для всего документа" aria-pressed="false"><b>B</b></button><button type="button" data-whole-format="italic" title="Курсив для всего документа" aria-pressed="false"><i>I</i></button><button type="button" data-whole-format="underline" title="Подчёркивание всего документа" aria-pressed="false"><u>U</u></button><button type="button" data-whole-format="strike" title="Зачёркивание всего документа" aria-pressed="false"><s>S</s></button>
+    <label class="color-wrap" title="Цвет всего документа">A <input id="textColor" type="color" value="#8055f7" aria-label="Цвет текста всего документа"></label>
+    <span class="divider"></span>
+    <button type="button" data-cmd="justifyLeft" title="По левому краю">☰</button><button type="button" data-cmd="justifyCenter" title="По центру">≡</button><button type="button" data-cmd="justifyRight" title="По правому краю">☷</button><button type="button" data-cmd="insertUnorderedList" title="Маркированный список">• Список</button><button type="button" data-cmd="insertOrderedList" title="Нумерованный список">1. Список</button>
+    <button type="button" data-cmd="undo" title="Отменить">↶</button><button type="button" data-cmd="redo" title="Повторить">↷</button><button type="button" data-cmd="removeFormat" title="Убрать форматирование">Tx</button>
+    <span class="divider"></span><button type="button" id="tableBtn">▦ Таблица</button><button type="button" id="imageBtn">▧ Картинка</button><button type="button" id="linkBtn">🔗 Ссылка</button><button type="button" id="openBtn">Открыть</button><input id="fileIn" type="file" accept=".txt,.html,.htm" hidden>
+  </div>
+  <div id="editorView">
+    <div class="workspace">
+      <section class="paper"><div id="editor" contenteditable="true" spellcheck="true" data-placeholder="Пиши здесь…"></div></section>
+      <aside class="panel"><h3>✦ Помощник</h3><div class="tip"><b>Всё просто!</b><br>Шрифт, размер, жирность, курсив и подчёркивание применяются сразу ко всему документу. Кнопки B, I, U и S работают как переключатели.</div><div class="quick"><b>Быстрые действия</b><button type="button" id="quickTable">▦ Добавить таблицу</button><button type="button" id="quickImage">▧ Вставить изображение</button><button type="button" id="quickChecklist">☑ Создать чек-лист</button><button type="button" id="quickTemplate">✦ Шаблон документа</button></div></aside>
+    </div>
+  </div>
+  <section id="recentView" aria-live="polite"><h2 id="listHeading">Недавние документы</h2><div class="recent-sub">Твои документы сохраняются автоматически на этом устройстве.</div><div class="recent-tools"><input id="searchDocs" type="search" placeholder="Поиск по документам…"></div><div class="recent-list" id="recentList"></div></section>
+</main>
+<footer><span id="stats">Страница 1　|　Слов: 0</span><span>Tekstora　•　Автосохранение включено</span></footer>
+<nav class="mobile-nav" aria-label="Навигация Tekstora">
+  <button class="mobile-tab active" type="button" data-mobile-view="editor">✍️<span>Документ</span></button>
+  <button class="mobile-tab" type="button" data-mobile-view="recent">🕘<span>Недавние</span></button>
+  <button class="mobile-tab" type="button" data-mobile-view="favorites">⭐<span>Избранное</span></button>
+  <button class="mobile-tab" type="button" id="mobileNewBtn">＋<span>Новый</span></button>
+</nav>
+</div>
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const ed=$('editor');
+const DB_KEY='tekstora_docs_v2';
+let docs=[];let activeId=null;let currentView='editor';let savedRange=null;let saveTimer=null;
+const starterHtml='';
+function makeId(){return 'lw-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8)}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function migrate(){
+  try{const raw=localStorage.getItem(DB_KEY);if(raw){const parsed=JSON.parse(raw);if(Array.isArray(parsed))docs=parsed}}catch(e){console.warn('Cannot read saved Tekstora library',e)}
+  if(!docs.length){let legacy='';try{legacy=localStorage.getItem('tekstora_doc')||''}catch(e){}
+    const oldTitle=localStorage.getItem('tekstora_title')||'Мой документ';
+    docs=[{id:makeId(),title:oldTitle,html:legacy||starterHtml,created:Date.now(),updated:Date.now(),favorite:localStorage.getItem('tekstora_favorite')==='1'}];
+  }
+  docs=docs.filter(d=>d&&d.id).map(d=>({...d,title:d.title||'Без названия',html:d.html||'',created:d.created||Date.now(),updated:d.updated||Date.now(),favorite:!!d.favorite,wholeFont:d.wholeFont||'Arial',wholeSize:Number(d.wholeSize)||12,wholeColor:d.wholeColor||'#252039',wholeStyles:d.wholeStyles||{bold:false,italic:false,underline:false,strike:false}}));
+  activeId=docs.slice().sort((a,b)=>b.updated-a.updated)[0]?.id||null;
+  persistDB();
+}
+function currentDoc(){return docs.find(d=>d.id===activeId)}
+function persistDB(){try{localStorage.setItem(DB_KEY,JSON.stringify(docs));}catch(e){$('saveState').textContent='⚠ Не хватило места для сохранения';return false}return true}
+function setStatus(text){$('saveState').textContent=text}
+function saveNow(){const d=currentDoc();if(!d)return;d.html=ed.innerHTML;d.wholeStyles=getWholeStyles();d.wholeFont=ed.style.getPropertyValue('--lw-whole-font')||'Arial';d.wholeSize=parseInt(ed.style.getPropertyValue('--lw-whole-size'))||12;d.wholeColor=ed.style.getPropertyValue('--lw-whole-color')||'#252039';d.updated=Date.now();d.title=d.title||'Без названия';persistDB();try{localStorage.setItem('tekstora_doc',d.html);localStorage.setItem('tekstora_title',d.title)}catch(e){}setStatus('● Сохранено');updateStats();if(currentView!=='editor')renderDocList()}
+function scheduleSave(){setStatus('● Сохранение…');clearTimeout(saveTimer);saveTimer=setTimeout(saveNow,250)}
+function updateStats(){const txt=ed.innerText.trim();const words=txt?txt.split(/\s+/).filter(Boolean).length:0;$('stats').textContent='Страница 1　|　Слов: '+words}
+function setTitle(d){$('titleButton').textContent=d.title+'　⌄';$('favBtn').textContent=d.favorite?'★':'☆';$('favBtn').title=d.favorite?'Убрать из избранного':'Добавить в избранное';document.title='Tekstora — '+d.title}
+function focusEditorEnd(){ed.focus();const r=document.createRange();r.selectNodeContents(ed);r.collapse(false);const s=getSelection();s.removeAllRanges();s.addRange(r);rememberSelection()}
+function openDoc(id){saveNow();const d=docs.find(x=>x.id===id);if(!d)return;activeId=id;ed.innerHTML=d.html||'';applyDocumentSettings(d);setTitle(d);showView('editor');savedRange=null;updateStats();setStatus('● Сохранено');d.updated=Date.now();persistDB()}
+function createDoc(){saveNow();const d={id:makeId(),title:'Новый документ',html:'',created:Date.now(),updated:Date.now(),favorite:false,wholeFont:'Arial',wholeSize:12,wholeColor:'#252039',wholeStyles:{bold:false,italic:false,underline:false,strike:false}};docs.push(d);activeId=d.id;ed.innerHTML='';applyDocumentSettings(d);setTitle(d);showView('editor');updateStats();scheduleSave();focusEditorEnd()}
+function renameDoc(){const d=currentDoc();if(!d)return;const value=prompt('Название документа:',d.title);if(value===null)return;d.title=value.trim()||'Без названия';setTitle(d);saveNow()}
+function showView(view){if(view!=='editor')saveNow();currentView=view;$('editorView').style.display=view==='editor'?'block':'none';$('toolbar').style.display=view==='editor'?'flex':'none';$('recentView').style.display=view==='editor'?'none':'block';document.querySelectorAll('.nav[data-view]').forEach(n=>n.classList.toggle('active',n.dataset.view===view));if(view!=='editor'){renderDocList();$('listHeading').textContent=view==='favorites'?'Избранное':'Недавние документы'}}
+function formatDate(ts){return new Intl.DateTimeFormat('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}).format(new Date(ts))}
+function renderDocList(){const list=$('recentList');list.innerHTML='';const q=$('searchDocs').value.trim().toLocaleLowerCase('ru');let items=docs.slice().sort((a,b)=>b.updated-a.updated);if(currentView==='favorites')items=items.filter(d=>d.favorite);if(q)items=items.filter(d=>(d.title+' '+plainText(d.html)).toLocaleLowerCase('ru').includes(q));if(!items.length){const empty=document.createElement('div');empty.className='empty-recent';empty.textContent=currentView==='favorites'?'Пока нет избранных документов. Добавь документ в избранное звёздочкой.':'Пока нет документов. Нажми «Новый документ», чтобы создать первый.';list.append(empty);return}
+  for(const d of items){const card=document.createElement('button');card.type='button';card.className='recent-card';const title=document.createElement('strong');title.textContent=(d.favorite?'★ ':'📄 ')+d.title;const preview=document.createElement('span');preview.className='recent-preview';preview.textContent=plainText(d.html).slice(0,130)||'Пустой документ — нажми, чтобы начать писать';const date=document.createElement('small');date.textContent='Изменён: '+formatDate(d.updated);card.append(title,preview,date);card.addEventListener('click',()=>openDoc(d.id));list.append(card)}
+}
+function plainText(html){const tmp=document.createElement('div');tmp.innerHTML=html||'';return tmp.innerText||tmp.textContent||''}
+function rememberSelection(){const s=getSelection();if(s&&s.rangeCount){const r=s.getRangeAt(0);if(ed.contains(r.commonAncestorContainer))savedRange=r.cloneRange()}}
+document.addEventListener('selectionchange',rememberSelection);ed.addEventListener('keyup',rememberSelection);ed.addEventListener('mouseup',rememberSelection);
+function restoreSelection(){ed.focus();if(savedRange&&ed.contains(savedRange.commonAncestorContainer)){const s=getSelection();s.removeAllRanges();s.addRange(savedRange)}else focusEditorEnd();rememberSelection()}
+function command(name,value=null){restoreSelection();try{document.execCommand(name,false,value);rememberSelection();scheduleSave()}catch(e){console.error(e);setStatus('⚠ Не удалось применить команду')}}
+function applyBlock(tag){if(tag)command('formatBlock',tag)}
+function getWholeStyles(){return {bold:ed.dataset.wholeBold==='true',italic:ed.dataset.wholeItalic==='true',underline:ed.dataset.wholeUnderline==='true',strike:ed.dataset.wholeStrike==='true'}}
+function setWholeStyles(styles={}){
+  for(const key of ['bold','italic','underline','strike']){const on=!!styles[key];ed.dataset['whole'+key[0].toUpperCase()+key.slice(1)]=String(on);const btn=document.querySelector('[data-whole-format="'+key+'"]');if(btn){btn.classList.toggle('is-active',on);btn.setAttribute('aria-pressed',String(on))}}
+  const dec=[];if(styles.underline)dec.push('underline');if(styles.strike)dec.push('line-through');
+  if(dec.length){ed.dataset.wholeDecoration='true';ed.style.setProperty('--lw-whole-decoration',dec.join(' '))}else{delete ed.dataset.wholeDecoration;ed.style.removeProperty('--lw-whole-decoration')}
+}
+function applyWholeFormat(name){const state=getWholeStyles();state[name]=!state[name];setWholeStyles(state);scheduleSave()}
+function applyDocumentSettings(d){const font=d.wholeFont||'Arial';const size=Math.max(6,Math.min(96,Number(d.wholeSize)||12));const color=d.wholeColor||'#252039';ed.dataset.wholeFontActive='true';ed.style.setProperty('--lw-whole-font',font);ed.style.fontFamily=font;ed.dataset.wholeSizeActive='true';ed.style.setProperty('--lw-whole-size',size+'pt');ed.style.fontSize=size+'pt';ed.dataset.wholeColorActive='true';ed.style.setProperty('--lw-whole-color',color);$('fontSelect').value=font;$('fontSize').value=size;$('textColor').value=color;setWholeStyles(d.wholeStyles||{})}
+function applyWholeFont(font){if(!font)return;ed.dataset.wholeFontActive='true';ed.style.setProperty('--lw-whole-font',font);ed.style.fontFamily=font;$('fontSelect').value=font;scheduleSave()}
+function applyWholeSize(value){let n=Number(value);if(!Number.isFinite(n))return;n=Math.max(6,Math.min(96,Math.round(n)));$('fontSize').value=n;ed.dataset.wholeSizeActive='true';ed.style.setProperty('--lw-whole-size',n+'pt');ed.style.fontSize=n+'pt';scheduleSave()}
+function applyColor(color){if(!/^#[0-9a-f]{6}$/i.test(color))return;ed.dataset.wholeColorActive='true';ed.style.setProperty('--lw-whole-color',color);$('textColor').value=color;scheduleSave()}
+function insertHTML(html){restoreSelection();document.execCommand('insertHTML',false,html);rememberSelection();scheduleSave()}
+function insertTable(){insertHTML('<table><tbody><tr><th>Заголовок</th><th>Заголовок</th></tr><tr><td>Текст</td><td>Текст</td></tr><tr><td>Текст</td><td>Текст</td></tr></tbody></table><p><br></p>')}
+function insertChecklist(){insertHTML('<p>☐ Задача 1</p><p>☐ Задача 2</p><p>☐ Задача 3</p><p><br></p>')}
+function insertTemplate(){insertHTML('<h1>Новый проект</h1><p><b>Цель:</b> </p><h2>План действий</h2><ol><li>Первый шаг</li><li>Второй шаг</li><li>Третий шаг</li></ol><h2>Заметки</h2><p>Добавь свои идеи…</p>')}
+function insertImage(){rememberSelection();const input=document.createElement('input');input.type='file';input.accept='image/*';input.onchange=()=>{const f=input.files?.[0];if(!f)return;const r=new FileReader();r.onload=()=>insertHTML('<img src="'+String(r.result)+'" alt="Вставленное изображение"><p><br></p>');r.onerror=()=>alert('Не получилось прочитать картинку.');r.readAsDataURL(f)};input.click()}
+function insertLink(){rememberSelection();let url=prompt('Адрес ссылки (например, https://example.com):');if(!url)return;if(!/^https?:\/\//i.test(url))url='https://'+url;command('createLink',url)}
+function downloadDoc(){saveNow();const d=currentDoc();if(!d)return;const css='<style>body{font-family:'+esc(ed.style.fontFamily||'Arial')+';font-size:'+esc(ed.style.fontSize||'12pt')+';color:'+esc(ed.style.getPropertyValue('--lw-whole-color')||'#252039')+';line-height:1.6}body,body *{color:'+esc(ed.style.getPropertyValue('--lw-whole-color')||'#252039')+'!important}table{border-collapse:collapse;width:100%}td,th{border:1px solid #999;padding:8px}img{max-width:100%;height:auto}</style>';const html='<!doctype html><html lang="ru"><head><meta charset="utf-8"><title>'+esc(d.title)+'</title>'+css+'</head><body>'+ed.innerHTML+'</body></html>';const blob=new Blob([html],{type:'application/msword;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=(d.title||'Tekstora').replace(/[\\/:*?"<>|]/g,'_')+'.doc';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500)}
+function openFile(event){const f=event.target.files?.[0];if(!f)return;const r=new FileReader();r.onload=()=>{if(/\.txt$/i.test(f.name))ed.innerHTML=String(r.result).split(/\r?\n/).map(line=>'<p>'+esc(line||' ')+'</p>').join('');else{const parsed=new DOMParser().parseFromString(String(r.result),'text/html');ed.innerHTML=parsed.body.innerHTML||''}const d=currentDoc();d.title=f.name.replace(/\.[^.]+$/,'')||'Открытый документ';setTitle(d);scheduleSave();updateStats()};r.onerror=()=>alert('Не удалось открыть файл.');r.readAsText(f);event.target.value=''}
+function toggleFavorite(){const d=currentDoc();if(!d)return;d.favorite=!d.favorite;setTitle(d);saveNow();if(currentView!=='editor')renderDocList();}
+function init(){migrate();const d=currentDoc();if(d){ed.innerHTML=d.html||'';applyDocumentSettings(d);setTitle(d)}else createDoc();updateStats();}
+$('newBtn').addEventListener('click',createDoc);$('favBtn').addEventListener('click',toggleFavorite);$('titleButton').addEventListener('click',renameDoc);$('downloadBtn').addEventListener('click',downloadDoc);$('blockStyle').addEventListener('change',e=>{applyBlock(e.target.value);e.target.value=''});$('fontSelect').addEventListener('change',e=>applyWholeFont(e.target.value));$('fontSize').addEventListener('change',e=>applyWholeSize(e.target.value));$('fontSize').addEventListener('keydown',e=>{if(e.key==='Enter'){applyWholeSize(e.target.value);e.target.blur()}});$('textColor').addEventListener('input',e=>applyColor(e.target.value));
+document.querySelectorAll('[data-cmd]').forEach(btn=>{btn.addEventListener('mousedown',e=>e.preventDefault());btn.addEventListener('click',()=>command(btn.dataset.cmd))});
+document.querySelectorAll('[data-whole-format]').forEach(btn=>btn.addEventListener('click',()=>applyWholeFormat(btn.dataset.wholeFormat))); 
+$('tableBtn').addEventListener('click',insertTable);$('imageBtn').addEventListener('click',insertImage);$('linkBtn').addEventListener('click',insertLink);$('openBtn').addEventListener('click',()=>$('fileIn').click());$('fileIn').addEventListener('change',openFile);
+$('quickTable').addEventListener('click',insertTable);$('quickImage').addEventListener('click',insertImage);$('quickChecklist').addEventListener('click',insertChecklist);$('quickTemplate').addEventListener('click',insertTemplate);$('templatesNav').addEventListener('click',()=>{showView('editor');insertTemplate()});
+document.querySelectorAll('.nav[data-view]').forEach(n=>n.addEventListener('click',()=>showView(n.dataset.view)));$('searchDocs').addEventListener('input',renderDocList);
+ed.addEventListener('input',()=>{rememberSelection();scheduleSave();updateStats()});window.addEventListener('beforeunload',saveNow);
+init();
+
+document.querySelectorAll('.mobile-tab[data-mobile-view]').forEach(btn=>btn.addEventListener('click',()=>showView(btn.dataset.mobileView)));
+$('mobileNewBtn').addEventListener('click',createDoc);
+const mobileTabs=[...document.querySelectorAll('.mobile-tab[data-mobile-view]')];
+const originalShowView=showView;
+showView=function(view){originalShowView(view);mobileTabs.forEach(btn=>btn.classList.toggle('active',btn.dataset.mobileView===view));};
+let deferredInstallPrompt=null;
+window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();deferredInstallPrompt=event;});
+$('installBtn').addEventListener('click',async()=>{
+  if(deferredInstallPrompt){
+    deferredInstallPrompt.prompt();
+    try{await deferredInstallPrompt.userChoice;}catch(e){}
+    deferredInstallPrompt=null;
+  }else{
+    const ua=navigator.userAgent||'';
+    if(/iPhone|iPad|iPod/i.test(ua)){
+      alert('Чтобы установить Tekstora на iPhone: открой сайт в Safari → нажми «Поделиться» → «На экран Домой».');
+    }else{
+      alert('Чтобы установить Tekstora: открой меню браузера (⋮ или …) и выбери «Установить Tekstora» или «Установить приложение». Для телефона сайт должен быть открыт по HTTPS-адресу.');
+    }
+  }
+});
+if('serviceWorker' in navigator && location.protocol!=='file:'){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(err=>console.warn('Service worker:',err)));
+}
+
+</script>
+</body>
+</html>
